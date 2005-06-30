@@ -61,22 +61,32 @@ class SomethingToPost:
       fname   -- name of object
       type    -- type of object
       file    -- temporary file name (will be posted)
+                 * this can be used as a scratch file intermediately
       pfile   -- file representing a preview of the object
       text    -- textual description of the object
   '''
       
   def __init__(self, fname, postdir):
-    self.fname = fname
+    self.fname = fname.replace(' ','\ ')
     self.type = os.path.splitext(fname)[1].lower()
     self.dir  = postdir
-    self.file  = '%s/%s' % (self.dir, os.path.basename(self.fname))
+    self.file = '%s/%s' % (self.dir, os.path.basename(fname))
+    self.file = self.file.replace(' ','_')
+    fid,self.pfile = tempfile.mkstemp(dir=self.dir, suffix='.png')
+    os.close(fid)
 
-  def thumbnailByConvert(self, source):
+  def thumbnailByConvert(self, source, rescale=1):
     ''' Standard preview via imagemagick '''
-    fid,self.pfile = tempfile.mkstemp(dir=self.dir, suffix='.jpg')
-    size = '%sx%s' % (THUMB_W, THUMB_H)
-    os.system('convert -size %s %s -resize %s\> -frame 3x3 %s' % (
-        size, source, size, self.pfile))
+    if rescale: size = '-resize %sx%s\>' % (THUMB_W, THUMB_H)
+    else:       size = ''
+    os.system('convert %s %s -frame 3x3 %s' % (
+      source, size, self.pfile))
+
+  def thumbnailOfType(self):
+    ''' Standard preview '''
+    fid,self.pfile = tempfile.mkstemp(dir=self.dir, suffix='.png')
+    os.system('convert -size 96x64 xc:transparent -font Arial.ttf -pointsize 32 -stroke magenta -draw "text 10,45 \'%s\'" -frame 3x3 %s' % (
+      self.type or ' ? ', self.pfile))
     os.close(fid)
 
   def post(self, postdir, index):
@@ -107,8 +117,9 @@ class Text(SomethingToPost):
     SomethingToPost.__init__(self, fname, postdir)
 
   def prep(self):
-    self.thumbnailByConvert(TEXT_ICON)
-    self.text = os.popen('head -5 %s | cut -c0-40' % self.fname).read()
+    os.system('a2ps %s --portrait --columns=1 --pages=1 --pretty-print -o - | convert - -crop 256x128+0+25 %s' % (self.fname, self.pfile))
+    self.thumbnailByConvert(self.pfile, rescale=0)
+    self.text = os.popen('head -5 %s | cut -c1-40' % self.fname).read()
     os.system('cp %s %s' % (self.fname, self.file))
  
     return [self]
@@ -125,7 +136,25 @@ class PS(SomethingToPost):
     self.thumbnailByConvert(self.file)
     os.system('cp %s %s' % (self.fname, self.file))
     
-    self.text = os.popen('ps2ascii %s | head -8 | cut -c0-40' % self.file).read()
+    self.text = os.popen('ps2ascii %s | head -8 | cut -c1-40' % self.file).read()
+ 
+    return [self]
+
+class HTML(SomethingToPost):
+  ''' HTML code
+  '''
+  def __init__(self, fname, postdir):
+    SomethingToPost.__init__(self, fname, postdir)
+
+  def prep(self):
+    ''' '''
+    os.system('pdfnup --nup 1x1 --pages 1-1 %s --outfile %s' % (
+        self.fname, self.file))
+    self.thumbnailByConvert(self.file)
+    os.system('cp %s %s' % (self.fname, self.file))
+    
+    self.text = os.popen('pdfinfo %s | egrep \"version|Page\"' % self.file).read()
+    self.text += os.popen('ps2ascii %s | head -8 | cut -c1-40' % self.file).read()
  
     return [self]
 
@@ -143,7 +172,7 @@ class PDF(SomethingToPost):
     os.system('cp %s %s' % (self.fname, self.file))
     
     self.text = os.popen('pdfinfo %s | egrep \"version|Page\"' % self.file).read()
-    self.text += os.popen('ps2ascii %s | head -8 | cut -c0-40' % self.file).read()
+    self.text += os.popen('ps2ascii %s | head -8 | cut -c1-40' % self.file).read()
  
     return [self]
 
@@ -166,21 +195,25 @@ class Image(SomethingToPost):
  
     return [self]
 
-class NONE(SomethingToPost):
+class NONE(Text):
   ''' For everything else, there's MasterCard
+      Subclass from Text in case we think this contains text
   '''
   def __init__(self, fname, postdir):
-    SomethingToPost.__init__(self, fname, postdir)
+    Text.__init__(self, fname, postdir)
 
   def prep(self):
     ''' Just link to it '''
     os.system('cp %s %s' % (self.fname, self.file))
-    self.thumbnailByConvert(UNKOWN_TYPE_ICON)
+    self.thumbnailOfType()
     sample = os.popen('head -5 %s' % self.file).read()[:100].strip()
-    if sample.replace(' ','').isalnum():
-      self.text = sample
+    if re.search('^#!/', sample):
+      Text.prep(self)
     else:
-      self.text = 'No preview for file type %s' % self.type
+      if sample.replace(' ','').isalnum():
+        self.text = sample
+      else:
+        self.text = 'No preview for file type %s' % self.type
 
     return [self]
 
@@ -273,7 +306,6 @@ if __name__ == '__main__':
       HTML_DIR, os.path.basename(postdir), os.path.basename(indexn))
   print longurl
   tinyurl = getTinyurl(longurl)
-  print tinyurl
   
   if '-clip' in options:
     try:
@@ -282,5 +314,8 @@ if __name__ == '__main__':
 #      root.clipboard_append(tinyurl)
       print 'copied to clipboard.'
     except: pass
+  if not '-notiny' in options:
+    print tinyurl
+
   
    
