@@ -1,4 +1,4 @@
-Jupi 0.1
+Jupi 0.11
 
 Author: Leo Szumel
 
@@ -8,7 +8,11 @@ Description:
 Usage:
   "jupi file1 [...]"
   "jupi dir1 [...]"
-  A URL (and TinyURL) are printed to the console. Send that link to your friend(s).
+  A TinyURL is printed to the console. Send that link to your friend(s).
+
+Options:
+  -bigurl   skip the TinyURL call
+  -clip     copy URL to the clipboard (broken)
 
 Installation:
   Put jupi in a good place (e.g. /usr/local/bin)
