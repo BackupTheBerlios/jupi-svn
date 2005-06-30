@@ -5,7 +5,8 @@
 #
 # Initial: 5/25/2005 Leo Szumel
 
-import tempfile, sys, re, os, time, urllib, glob, datetime
+import tempfile, sys, re, os, time, urllib, glob, datetime, htmllib
+import formatter, urlparse
 #from  Tkinter import Tk
 
 # These are the defaults.
@@ -117,7 +118,7 @@ class Text(SomethingToPost):
     SomethingToPost.__init__(self, fname, postdir)
 
   def prep(self):
-    os.system('a2ps %s --portrait --columns=1 --pages=1 --pretty-print -o - | convert - -crop 256x128+0+25 %s' % (self.fname, self.pfile))
+    os.system('a2ps %s --prologue=color --portrait --columns=1 --pages=1 --pretty-print --delegate=0 -o - | convert - -crop 256x128+0+25 %s' % (self.fname, self.pfile))
     self.thumbnailByConvert(self.pfile, rescale=0)
     self.text = os.popen('head -5 %s | cut -c1-40' % self.fname).read()
     os.system('cp %s %s' % (self.fname, self.file))
@@ -137,24 +138,6 @@ class PS(SomethingToPost):
     os.system('cp %s %s' % (self.fname, self.file))
     
     self.text = os.popen('ps2ascii %s | head -8 | cut -c1-40' % self.file).read()
- 
-    return [self]
-
-class HTML(SomethingToPost):
-  ''' HTML code
-  '''
-  def __init__(self, fname, postdir):
-    SomethingToPost.__init__(self, fname, postdir)
-
-  def prep(self):
-    ''' '''
-    os.system('pdfnup --nup 1x1 --pages 1-1 %s --outfile %s' % (
-        self.fname, self.file))
-    self.thumbnailByConvert(self.file)
-    os.system('cp %s %s' % (self.fname, self.file))
-    
-    self.text = os.popen('pdfinfo %s | egrep \"version|Page\"' % self.file).read()
-    self.text += os.popen('ps2ascii %s | head -8 | cut -c1-40' % self.file).read()
  
     return [self]
 
@@ -217,6 +200,32 @@ class NONE(Text):
 
     return [self]
 
+class HTML(NONE):
+  ''' HTML code
+  '''
+  def __init__(self, fname, postdir):
+    NONE.__init__(self, fname, postdir)
+
+  def prep(self):
+    ''' Goal here is to grab links for the text preview  '''
+    #Text.prep(self)
+    Text.prep(self)
+    
+    html = open(self.file).read()
+    p = htmllib.HTMLParser(formatter.NullFormatter())
+    p.feed(html)
+    p.close()
+    urls = {}
+    for u in [u for u in p.anchorlist if u[0:4] == 'http']:
+      urls[u] = urls.get(u, 0) + 1
+    urlfreqs = [(f,u) for (u, f) in urls.items()]
+    urlfreqs.sort()
+    self.text = ''
+    for (f,u) in urlfreqs[0:5]:
+      self.text += '<a href=\"%s\">%s</a>\n' % (u, u[0:30])
+ 
+    return [self]
+
 if __name__ == '__main__':
   stps = []
   postdir = tempfile.mkdtemp()
@@ -235,8 +244,10 @@ if __name__ == '__main__':
         stp = PDF(t, postdir)
       elif type == '.zip':
         stp = ZIP(t, postdir)
-      elif type in ['.txt','.html','.py','.c','.h']:
+      elif type in ['.txt','.py','.c','.h']:
         stp = Text(t, postdir)
+      elif type in ['.html','.htm']:
+        stp = HTML(t, postdir)
       # handle other types here, before default
       else:
         test = os.popen4('identify -verbose ' + t)[1].read()
@@ -268,7 +279,7 @@ if __name__ == '__main__':
     <tr>
       <td align=\"right\">
         <a href=\"%(file)s\">
-        <img border=0 src=\"%(img)s\" alt=\"%(text)s\"></img> </a>
+        <img border=0 src=\"%(img)s\" alt=\"%(file)s\"></img> </a>
       </td>
       <td>
         <a href=\"%(file)s\">%(file)s (%(size)s)</a><br>
@@ -304,8 +315,6 @@ if __name__ == '__main__':
   os.system('scp -rp %s %s/%s' % (postdir, HTML_ROOT, HTML_DIR))
   longurl = '%s/%s/%s/%s' % (HTML_EXTERNAL_ROOT,
       HTML_DIR, os.path.basename(postdir), os.path.basename(indexn))
-  print longurl
-  tinyurl = getTinyurl(longurl)
   
   if '-clip' in options:
     try:
@@ -314,8 +323,11 @@ if __name__ == '__main__':
 #      root.clipboard_append(tinyurl)
       print 'copied to clipboard.'
     except: pass
-  if not '-notiny' in options:
+  if not '-bigurl' in options:
+    tinyurl = getTinyurl(longurl)
     print tinyurl
+  else:
+    print longurl
 
   
    
