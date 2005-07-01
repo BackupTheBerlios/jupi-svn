@@ -23,12 +23,12 @@ THUMB_H = '256'
 DEF_EXPIRY = 7 # days to expiration
 RCFILE = '.jupirc'
 THUMBTYPE = '.png' # canuse .gif for MacOS
+RCROOTS = ['~/','./']
 
-try:
-  exec open(os.path.expanduser('~/' + RCFILE)).read()
-  exec open(os.path.expanduser('./' + RCFILE)).read()
-except:
-  print 'No (or invalid) .jupirc file found; using defaults'
+for rcc in [os.path.expanduser(r + RCFILE) for r in RCROOTS]:
+  if os.path.exists(rcc):
+    try:    exec open(rcc).read()
+    except: print '!!! Problem with ' + rcc
 
 # for safe debugging
 def ossystem(str):
