@@ -14,7 +14,6 @@ import formatter, urlparse
 HTML_ROOT = 'machine:path'
 HTML_DIR  = 'temp'
 HTML_EXTERNAL_ROOT = 'probably http://machine/~something'
-UNKOWN_TYPE_ICON = 'path-to-image'
 ZIP_ICON = 'path-to-image'
 TEXT_ICON = 'path-to-image'
 PAGEAUTH = 'Mr Mister'
@@ -23,11 +22,13 @@ THUMB_W = '256'
 THUMB_H = '256'
 DEF_EXPIRY = 7 # days to expiration
 RCFILE = '.jupirc'
+THUMBTYPE = '.gif'
 
 try:
   exec open(os.path.expanduser('~/' + RCFILE)).read()
+  exec open(os.path.expanduser('./' + RCFILE)).read()
 except:
-  print 'No .jupirc file found; using defaults'
+  print 'No (or invalid) .jupirc file found; using defaults'
 
 # for safe debugging
 def ossystem(str):
@@ -73,7 +74,7 @@ class SomethingToPost:
     self.dir  = postdir
     self.file = '%s/%s' % (self.dir, os.path.basename(fname))
     self.file = self.file.replace(' ','_')
-    fid,self.pfile = tempfile.mkstemp(dir=self.dir, suffix='.png')
+    fid,self.pfile = tempfile.mkstemp(dir=self.dir, suffix=THUMBTYPE)
     os.close(fid)
 
   def thumbnailByConvert(self, source, rescale=1):
@@ -85,7 +86,7 @@ class SomethingToPost:
 
   def thumbnailOfType(self):
     ''' Standard preview '''
-    fid,self.pfile = tempfile.mkstemp(dir=self.dir, suffix='.png')
+    fid,self.pfile = tempfile.mkstemp(dir=self.dir, suffix=THUMBTYPE)
     os.system('convert -size 96x64 xc:transparent -font Arial.ttf -pointsize 32 -stroke magenta -draw "text 10,45 \'%s\'" -frame 3x3 %s' % (
       self.type or ' ? ', self.pfile))
     os.close(fid)
