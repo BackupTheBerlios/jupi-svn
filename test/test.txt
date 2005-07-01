@@ -1,0 +1,5 @@
+jupi is the fast and efficient 
+way to get files from your command 
+line onto the web. Don't open your 
+bloated mail program or send huge 
+attachments to friends. Use jupi!
