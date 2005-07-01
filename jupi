@@ -22,7 +22,7 @@ THUMB_W = '256'
 THUMB_H = '256'
 DEF_EXPIRY = 7 # days to expiration
 RCFILE = '.jupirc'
-THUMBTYPE = '.gif'
+THUMBTYPE = '.png' # canuse .gif for MacOS
 
 try:
   exec open(os.path.expanduser('~/' + RCFILE)).read()
