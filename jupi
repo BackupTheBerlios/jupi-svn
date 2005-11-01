@@ -264,7 +264,7 @@ def usage():
 if __name__ == '__main__':
   stps = []
   postdir = tempfile.mkdtemp()
-  opts, todo = getopt.getopt(sys.argv[1:], 'bce:t')
+  opts, todo = getopt.getopt(sys.argv[1:], 'hbce:t')
   options = dict(opts)
 
   # Preprocess/check arguments

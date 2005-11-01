@@ -1,4 +1,4 @@
-Jupi 0.12
+Jupi 0.13
 
 Author: Leo Szumel
 
@@ -20,10 +20,10 @@ Installation:
   Create a ~/.jupirc containing the fields from jupi that you want to modify
   You should set at least these:
     cat > ~/.jupirc
-    HTML_ROOT = 'www.domain.net:Html'
-    HTML_DIR  = 'temp'
+    HTML_MACh = 'www.domain.net'
+    HTML_DIR  = 'Html/jupi'
     HTML_USER = 'williewonka' 
-    HTML_EXTERNAL_ROOT = 'http://www.domain.net/~williewonka'
+    HTML_EXTERNAL_ROOT = 'http://www.domain.net/~williewonka/jupi'
     ZIP_ICON = '~/images/mr_zip.png'
     PAGEAUTH = 'Willie Wonka'
     AUTHEMAIL= 'willie@domain.net'
@@ -36,12 +36,11 @@ Installation:
   of packages they had to install, I'll compile them into a list.
 
 Usage:
-  "jupi [file(s)] [dir(s)]
+  "jupi [option(s)] [file(s)] [dir(s)]
   A TinyURL is printed to the console. Send that link to your friend(s).
 
 Options:
-  -bigurl   skip the TinyURL call
-  -clip     copy URL to the clipboard (broken)
+  try "jupi -h"
 
 Bugs:
   -clip option currently not working; it should place the URL in the clipboard.
