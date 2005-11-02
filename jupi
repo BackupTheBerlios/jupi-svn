@@ -389,7 +389,7 @@ if __name__ == '__main__':
   if not '-t' in options:
     os.system('scp -rp %s %s@%s:%s' % (postdir, HTML_USER, HTML_MACH, HTML_DIR))
     if expiry:
-      os.system('ssh %s@%s at 23:59 + %d days -f %s' % (HTML_USER, HTML_MACH, expiry, os.path.join(postpath, '.expiry')))
+      os.system('ssh %s@%s at 23:59 + %d days -f %s' % (HTML_USER, HTML_MACH, expiry, os.path.join(HTML_DIR, os.path.basename(postpath), '.expiry')))
   # Handle additional options
   if '-c' in options:
     try:
