@@ -269,9 +269,13 @@ if __name__ == '__main__':
 
   # Preprocess/check arguments
   expiry= DEF_EXPIRY
+  
+  if not len(todo):
+    usage()
+    sys.exit()
 
   for o,a in options.items():
-    if o in ('-h','--help') or not len(todo):
+    if o in ('-h','--help'):
       usage()
       sys.exit()
     elif o == '-e':
@@ -346,7 +350,7 @@ if __name__ == '__main__':
     <meta name=\"ROBOTS\" content=\"NOINDEX, NOFOLLOW\">
     <title>A quick note to you from %s</title>
     <h3>A quick note to you from %s</h3>
-    <p><i>Please do not link to this page (expires %s)</i></p>
+    <p><i>Be careful when linking to this page (expires %s)</i></p>
     <hr width=50%%>
     <table border=\"0\" width=\"66%%\" cellspacing=\"10\">''' % (
       PAGEAUTH, PAGEAUTH, expirystring))#'%A %B %d %Y'
