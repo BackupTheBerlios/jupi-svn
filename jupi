@@ -73,10 +73,12 @@ class SomethingToPost:
       
   def __init__(self, fname, postdir):
     self.fname = fname.replace(' ','\ ')
+    self.fname = fname.replace('|','\|')
     self.type = os.path.splitext(fname)[1].lower()
     self.dir  = postdir
     self.file = '%s/%s' % (self.dir, os.path.basename(fname))
     self.file = self.file.replace(' ','_')
+    self.file = self.file.replace('|','_')
     typetest  = os.popen4('identify -verbose ' + self.fname + '[0]')[1].read()
     m = re.search('[:space:]*Type: (.*)', typetest) 
     if m and m.group(1) in 'Grayscale TrueColor':
@@ -310,6 +312,8 @@ if __name__ == '__main__':
 
   # Handle each file:
   for t in todo:
+    #t = t.replace('|', '\|')
+    print t
     if os.path.isdir(t):
       todo.extend(glob.glob(t+'/*'))
       continue
