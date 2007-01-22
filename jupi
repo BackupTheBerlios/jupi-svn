@@ -73,7 +73,7 @@ class SomethingToPost:
       
   def __init__(self, fname, postdir):
     self.fname = fname.replace(' ','\ ')
-    self.fname = fname.replace('|','\|')
+    self.fname = self.fname.replace('|','\|')
     self.type = os.path.splitext(fname)[1].lower()
     self.dir  = postdir
     self.file = '%s/%s' % (self.dir, os.path.basename(fname))
@@ -329,7 +329,7 @@ if __name__ == '__main__':
         stp = Excel(t, postdir)
       elif type == '.doc':
         stp = WordDoc(t, postdir)
-      elif type in ['.txt','.py','.c','.h']:
+      elif type in ['.txt','.py','.rb','.cpp','.c','.h']:
         stp = Text(t, postdir)
       elif type in ['.html','.htm']:
         stp = HTML(t, postdir)
