@@ -145,18 +145,18 @@ class WordDoc(Text):
   '''
   def __init__(self, fname, postdir):
     docf,docn = tempfile.mkstemp(dir='/tmp/', suffix='.txt')
-    os.system('catdoc %s > %s' % (fname, docn))
+    Text.__init__(self, fname, postdir, a2psfile=docn) # will clean up filename
+    os.system('catdoc %s > %s' % (self.fname, docn))
     os.close(docf)
-    Text.__init__(self, fname, postdir, a2psfile=docn)
 
 class Excel(Text):
   ''' A MS Excel. Convert to .csv and treat as Text.
   '''
   def __init__(self, fname, postdir):
     csvf,csvn = tempfile.mkstemp(dir='/tmp/', suffix='.csv')
-    os.system('xls2csv %s > %s' % (fname, csvn))
+    Text.__init__(self, fname, postdir, a2psfile=csvn) # will clean up filename
+    os.system('xls2csv %s > %s' % (self.fname, csvn))
     os.close(csvf)
-    Text.__init__(self, fname, postdir, a2psfile=csvn)
 
 class PS(SomethingToPost):
   ''' Postscript (PS) files
