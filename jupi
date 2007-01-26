@@ -40,13 +40,15 @@ for rcc in [os.path.expanduser(r + RCFILE) for r in RCROOTS]:
     ln = 0
     for l in open(rcc).readlines():
       ln += 1
+
       if l.isspace(): continue
+      if l.startswith('#'): continue
+      if not l.find('='): continue
 
+      l = l.split('#')[0] # to remove any trailing comments
       rcl = l.strip().split('=')
-      arg,val = [s.strip() for s in rcl[0:1]]
+      arg,val = [s.strip() for s in rcl[0:2]]
       
-      if arg.startswith('#'): continue
-
       if arg == 'HTML_MACH':
         HTML_MACH = val
       elif arg == 'HTML_DIR':
