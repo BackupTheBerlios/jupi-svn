@@ -44,3 +44,9 @@ Options:
 
 Bugs:
   -clip option currently not working; it should place the URL in the clipboard.
+
+Notes:
+  The Debian package was prepared from the directions at:
+    http://www.debian-administration.org/articles/336
+  Please contact me with any issues regarding this package.
+

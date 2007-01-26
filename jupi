@@ -13,12 +13,8 @@ import formatter, urlparse, getopt
 # Put modifications in ~/.jupirc
 EXPIRED_DIR = '$HOME/jupi-old' # where expired pages get moved
 HTML_MACH = 'machine'      # hostname
-HTML_DIR  = 'Html/temp'    # subdir on HTML_MACH where jupi will post
-HTML_USER = 'username'     # best set up an ssh key for this
-HTML_EXTERNAL_ROOT = 'http://machine/~something/temp' # root pages appear externally
-ZIP_ICON = 'path-to-image' # local path to an icon for ZIP files
-PAGEAUTH = 'Mr Mister'     # your [pseudo]name
-AUTHEMAIL= 'author@domain' # your email address (will be made bot-immunized)
+PAGEAUTH = 'Nobody'     # your [pseudo]name
+AUTHEMAIL= 'No@body.net' # your email address (will be made bot-immunized)
 THUMB_W = '256'            # thumbnail constraint (width)
 THUMB_H = '256'            # thumbnail constraint (height)
 DEF_EXPIRY = 7             # days to expiration  (0 for never)
@@ -28,10 +24,58 @@ THUMBTYPE = '.png'         # thumbnail format for INDEXED images
                            # .jpg is always used for TrueColor/Grayscale images
 RCROOTS = ['~/','./']      # places to look for RCFILE
 
+# Example .jupirc
+#
+#HTML_MACH = 'joesbox'
+#HTML_DIR  = 'Html/temp'
+#HTML_USER = 'joe' # best set up an ssh key for this
+#HTML_EXTERNAL_ROOT = 'http://www.joe.net/~joe/temp'
+#ZIP_ICON = '~joe/images/zip.png'
+#PAGEAUTH = 'Joe Johnson'
+#AUTHEMAIL= 'joe@joe.net'
+#THUMBTYPE = '.gif'
+
 for rcc in [os.path.expanduser(r + RCFILE) for r in RCROOTS]:
   if os.path.exists(rcc):
-    try:    exec open(rcc).read()
-    except: print '!!! Problem with ' + rcc
+    ln = 0
+    for l in open(rcc).readlines():
+      ln += 1
+      if l.isspace(): continue
+
+      rcl = l.strip().split('=')
+      arg,val = [s.strip() for s in rcl]
+      
+      if arg.startswith('#'): continue
+
+      if arg == 'HTML_MACH':
+        HTML_MACH = val
+      elif arg == 'HTML_DIR':
+        HTML_DIR = val
+      elif arg == 'HTML_USER':
+        HTML_USER = val
+      elif arg == 'HTML_EXTERNAL_ROOT':
+        HTML_EXTERNAL_ROOT = val
+      elif arg == 'ZIP_ICON':
+        if os.path.isfile(os.path.expanduser(val)):
+          ZIP_ICON = val
+      elif arg == 'PAGEAUTH':
+        PAGEAUTH = val
+      elif arg == 'AUTHEMAIL':
+        AUTHEMAIL = val
+      elif arg == 'THUMB_W':
+        THUMB_W = val
+      elif arg == 'THUMB_H':
+        THUMB_H = val
+      elif arg == 'DEF_EXPIRY':
+        DEF_EXPIRY = int(val)
+      elif arg == 'THUMBTYPE':
+        THUMBTYPE = val
+      else:
+        print 'jupi: does not understand rc line',ln,':',l
+
+# old, unsafe method
+#    try:    exec open(rcc).read()
+#    except: print '!!! Problem with ' + rcc
 
 # for safe debugging
 def ossystem(str):
