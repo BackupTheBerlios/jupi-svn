@@ -1,0 +1,20 @@
+Package: jupi
+Version: 0.1
+Section: net
+Priority: extra
+Architecture: i386
+Depends: python, imagemagick, a2ps, catdoc, unzip, gs-common, xpdf-utils, jhead
+Installed-Size: 28
+Maintainer: Leo Szumel <lszumel@gmail.com>
+Description: easy way to get files from command line to the web
+ Problem: you are on the command line and want to send a file (or
+ set of files) to a friend with minimum fuss.
+ .
+ Solution: jupi your files. jupi creates smart thumbnails of your
+ files, posts them to a web server, and gives you a tinyurl suitable
+ for email or IM.
+ .
+ Why not just use email? First, calling jupi is easier (especially if
+ you have a large set of files). Second, email attachments have size
+ limits. Third, if you're sending to multiple recipients, the Right
+ Thing to Do is to send a link, not a file.
