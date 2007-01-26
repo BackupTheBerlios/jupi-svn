@@ -43,7 +43,7 @@ for rcc in [os.path.expanduser(r + RCFILE) for r in RCROOTS]:
       if l.isspace(): continue
 
       rcl = l.strip().split('=')
-      arg,val = [s.strip() for s in rcl]
+      arg,val = [s.strip() for s in rcl[0:1]]
       
       if arg.startswith('#'): continue
 
