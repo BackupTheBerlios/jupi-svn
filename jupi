@@ -19,6 +19,7 @@ THUMB_W = '256'            # thumbnail constraint (width)
 THUMB_H = '256'            # thumbnail constraint (height)
 DEF_EXPIRY = 7             # days to expiration  (0 for never)
 RCFILE = '.jupirc'         # name of .rc file (can override any globals)
+ZIP_ICON = ''              # path to icon for zipfiles
 THUMBTYPE = '.png'         # thumbnail format for INDEXED images 
                            # (canuse .gif for MacOS)
                            # .jpg is always used for TrueColor/Grayscale images
